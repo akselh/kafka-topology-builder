@@ -86,24 +86,11 @@ public class AccessControlManager {
     List<Action> actions = new ArrayList<>();
 
     for (Project project : topology.getProjects()) {
-      project
-          .getTopics()
-          .forEach(
-              topic -> {
-                final String fullTopicName = topic.toString();
-                if (!project.getConsumers().isEmpty()) {
-                  Action action =
-                      new BuildBindingsForConsumer(
-                          bindingsBuilder, project.getConsumers(), fullTopicName);
-                  actions.add(action);
-                }
-                if (!project.getProducers().isEmpty()) {
-                  Action action =
-                      new BuildBindingsForProducer(
-                          bindingsBuilder, project.getProducers(), fullTopicName);
-                  actions.add(action);
-                }
-              });
+      if (config.shouldOptimizeAcls()) {
+        actions.addAll(buildOptimizeConsumerAndProducerAcls(project));
+      } else {
+        actions.addAll(buildDetailedConsumerAndProducerAcls(project));
+      }
       // Setup global Kafka Stream Access control lists
       String topicPrefix = project.namePrefix();
       for (KStream app : project.getStreams()) {
@@ -126,6 +113,40 @@ public class AccessControlManager {
 
       syncRbacRawRoles(project.getRbacRawRoles(), topicPrefix, actions);
     }
+    return actions;
+  }
+
+  private List<Action> buildOptimizeConsumerAndProducerAcls(Project project) {
+    List<Action> actions = new ArrayList<>();
+    actions.add(
+        new BuildBindingsForConsumer(
+            bindingsBuilder, project.getConsumers(), project.namePrefix(), true));
+    actions.add(
+        new BuildBindingsForProducer(
+            bindingsBuilder, project.getProducers(), project.namePrefix(), true));
+    return actions;
+  }
+
+  private List<Action> buildDetailedConsumerAndProducerAcls(Project project) {
+    List<Action> actions = new ArrayList<>();
+    project
+        .getTopics()
+        .forEach(
+            topic -> {
+              final String fullTopicName = topic.toString();
+              if (!project.getConsumers().isEmpty()) {
+                Action action =
+                    new BuildBindingsForConsumer(
+                        bindingsBuilder, project.getConsumers(), fullTopicName);
+                actions.add(action);
+              }
+              if (!project.getProducers().isEmpty()) {
+                Action action =
+                    new BuildBindingsForProducer(
+                        bindingsBuilder, project.getProducers(), fullTopicName);
+                actions.add(action);
+              }
+            });
     return actions;
   }
 

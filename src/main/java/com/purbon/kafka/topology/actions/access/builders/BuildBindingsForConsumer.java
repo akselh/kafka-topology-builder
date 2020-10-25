@@ -13,18 +13,28 @@ public class BuildBindingsForConsumer extends BaseAccessControlAction {
   private final String fullTopicName;
   private final List<Consumer> consumers;
   private final BindingsBuilderProvider builderProvider;
+  private boolean prefixed;
 
   public BuildBindingsForConsumer(
       BindingsBuilderProvider builderProvider, List<Consumer> consumers, String fullTopicName) {
+    this(builderProvider, consumers, fullTopicName, false);
+  }
+
+  public BuildBindingsForConsumer(
+      BindingsBuilderProvider builderProvider,
+      List<Consumer> consumers,
+      String fullTopicName,
+      boolean prefixed) {
     super();
     this.consumers = consumers;
     this.fullTopicName = fullTopicName;
     this.builderProvider = builderProvider;
+    this.prefixed = prefixed;
   }
 
   @Override
   protected void execute() {
-    bindings = builderProvider.buildBindingsForConsumers(consumers, fullTopicName);
+    bindings = builderProvider.buildBindingsForConsumers(consumers, fullTopicName, prefixed);
   }
 
   @Override

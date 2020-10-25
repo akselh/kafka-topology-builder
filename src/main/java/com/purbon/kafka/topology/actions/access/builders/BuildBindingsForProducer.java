@@ -15,13 +15,23 @@ public class BuildBindingsForProducer extends BaseAccessControlAction {
   private final BindingsBuilderProvider builderProvider;
   private final List<Producer> producers;
   private final String fullTopicName;
+  private final boolean prefixed;
 
   public BuildBindingsForProducer(
       BindingsBuilderProvider builderProvider, List<Producer> producers, String fullTopicName) {
+    this(builderProvider, producers, fullTopicName, false);
+  }
+
+  public BuildBindingsForProducer(
+      BindingsBuilderProvider builderProvider,
+      List<Producer> producers,
+      String fullTopicName,
+      boolean prefixed) {
     super();
     this.builderProvider = builderProvider;
     this.producers = producers;
     this.fullTopicName = fullTopicName;
+    this.prefixed = prefixed;
   }
 
   @Override
@@ -29,7 +39,7 @@ public class BuildBindingsForProducer extends BaseAccessControlAction {
     Stream<String> producersStream = producers.stream().map(p -> p.getPrincipal());
     bindings =
         builderProvider.buildBindingsForProducers(
-            producersStream.collect(Collectors.toList()), fullTopicName);
+            producersStream.collect(Collectors.toList()), fullTopicName, prefixed);
   }
 
   @Override

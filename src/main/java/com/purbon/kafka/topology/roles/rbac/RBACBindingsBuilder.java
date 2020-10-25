@@ -139,6 +139,12 @@ public class RBACBindingsBuilder implements BindingsBuilderProvider {
   }
 
   @Override
+  public List<TopologyAclBinding> buildBindingsForConsumers(
+      Collection<Consumer> consumers, String topic, boolean prefixed) {
+    return buildBindingsForConsumers(consumers, topic);
+  }
+
+  @Override
   public List<TopologyAclBinding> buildBindingsForProducers(
       Collection<String> principals, String topic) {
     List<TopologyAclBinding> bindings = new ArrayList<>();
@@ -148,6 +154,12 @@ public class RBACBindingsBuilder implements BindingsBuilderProvider {
           bindings.add(binding);
         });
     return bindings;
+  }
+
+  @Override
+  public List<TopologyAclBinding> buildBindingsForProducers(
+      Collection<String> principals, String topic, boolean prefixed) {
+    return buildBindingsForProducers(principals, topic);
   }
 
   @Override
