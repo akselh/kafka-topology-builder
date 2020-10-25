@@ -387,7 +387,7 @@ public class AccessControlManagerTest {
 
     doReturn(new ArrayList<TopologyAclBinding>())
         .when(aclsBuilder)
-        .buildBindingsForConsumers(users, topicA.toString());
+        .buildBindingsForConsumers(users, topicA.toString(), false);
     accessControlManager.apply(topology, plan);
 
     plan.run(true);

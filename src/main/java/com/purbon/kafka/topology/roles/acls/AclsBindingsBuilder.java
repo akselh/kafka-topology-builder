@@ -86,28 +86,17 @@ public class AclsBindingsBuilder implements BindingsBuilderProvider {
 
   @Override
   public List<TopologyAclBinding> buildBindingsForConsumers(
-      Collection<Consumer> consumers, String topic, boolean prefixed) {
+      Collection<Consumer> consumers, String resource, boolean prefixed) {
     return toList(
-        consumers.stream().flatMap(consumer -> consumerAclsStream(consumer, topic, prefixed)));
-  }
-
-  @Override
-  public List<TopologyAclBinding> buildBindingsForConsumers(
-      Collection<Consumer> consumers, String topic) {
-    return buildBindingsForConsumers(consumers, topic, false);
+        consumers.stream().flatMap(consumer -> consumerAclsStream(consumer, resource, prefixed)));
   }
 
   @Override
   public List<TopologyAclBinding> buildBindingsForProducers(
-      Collection<String> principals, String topic, boolean prefixed) {
+      Collection<String> principals, String resource, boolean prefixed) {
     return toList(
-        principals.stream().flatMap(principal -> producerAclsStream(principal, topic, prefixed)));
-  }
-
-  @Override
-  public List<TopologyAclBinding> buildBindingsForProducers(
-      Collection<String> principals, String topic) {
-    return buildBindingsForProducers(principals, topic, false);
+        principals.stream()
+            .flatMap(principal -> producerAclsStream(principal, resource, prefixed)));
   }
 
   @Override
