@@ -16,7 +16,7 @@ public final class TestConsumer implements Closeable {
   /* This timeout includes the time spent fetching meta data, which may actually be several hundred ms.
    * If the timeout is too short, the poll function will return after fetching meta data, but before
    * actually trying to access the topic, thus not throwing the exception we are looking for. */
-  private static final long MAX_SEC_TO_CONSUME = 120;
+  private static final long MAX_SEC_TO_CONSUME = 240;
   private final KafkaConsumer<String, String> consumer;
 
   public interface RecordHandler {
