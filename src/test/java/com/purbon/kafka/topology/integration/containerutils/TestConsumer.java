@@ -1,21 +1,22 @@
 package com.purbon.kafka.topology.integration.containerutils;
 
-import java.io.Closeable;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+import java.io.Closeable;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
+
 public final class TestConsumer implements Closeable {
 
   /* This timeout includes the time spent fetching meta data, which may actually be several hundred ms.
    * If the timeout is too short, the poll function will return after fetching meta data, but before
    * actually trying to access the topic, thus not throwing the exception we are looking for. */
-  private static final long MAX_MS_TO_CONSUME = 60 * 1000L;
+  private static final long MAX_SEC_TO_CONSUME = 120;
   private final KafkaConsumer<String, String> consumer;
 
   public interface RecordHandler {
@@ -53,7 +54,7 @@ public final class TestConsumer implements Closeable {
 
   public void consumeForAWhile(final String topicName, final RecordHandler handler) {
     consumer.subscribe(Collections.singleton(topicName));
-    final long endTime = System.currentTimeMillis() + MAX_MS_TO_CONSUME;
+    final long endTime = System.currentTimeMillis() + MAX_SEC_TO_CONSUME * 1000;
     boolean continueConsuming = true;
     while (continueConsuming && System.currentTimeMillis() < endTime) {
       final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
