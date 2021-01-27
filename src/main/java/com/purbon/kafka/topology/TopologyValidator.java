@@ -73,6 +73,10 @@ public class TopologyValidator {
     return Stream.concat(streamOfTopologyResults, streamOfTopicResults)
         .filter(Either::isRight)
         .map(either -> either.getRight().get().getMessage())
+            .map(msg -> {
+              System.out.println(msg);
+              return msg;
+            })
         .collect(Collectors.toList());
   }
 

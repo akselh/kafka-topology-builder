@@ -1,0 +1,54 @@
+---
+context: "contextOrg"
+source: "source"
+projects:
+  - name: "foo"
+    consumers:
+      - principal: "User:User1"
+        metadata:
+          system: "systemA"
+    producers:
+      - principal: "User:User2"
+        metadata:
+          system: "systemB"
+    streams:
+      - principal: "User:App0"
+        metadata:
+          system: "systemC"
+        applicationId: "App0_id"
+        topics:
+          read:
+            - "topicA"
+          write:
+            - "topicB"
+    connectors:
+      - principal: "User:Connect1"
+        metadata:
+          system: "systemD"
+        cluster_id: "foo"
+        group: "group"
+        topics:
+          read:
+            - "topicA"
+      - principal: "User:Connect2"
+        topics:
+          write:
+            - "topicC"
+    topics:
+      - name: "foo"
+        metadata:
+          subdomain: "sales"
+          type: "business"
+        config:
+          replication.factor: "1"
+          num.partitions: "1"
+  - name: "bar"
+    topics:
+      - name: "foo_bar_baz"
+        metadata:
+          subdomain: "application_metrics"
+          type: "technical"
+        config:
+          replication.factor: "1"
+          num.partitions: "1"
+          cleanup.policy: "compact"

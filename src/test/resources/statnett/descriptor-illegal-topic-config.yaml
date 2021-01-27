@@ -1,0 +1,10 @@
+---
+context: "contextOrg"
+source: "source"
+projects:
+  - name: "foo"
+    topics:
+      - name: "foo"
+        config:
+          replication.factor: "1"
+          not.a.config: "Oh..no"

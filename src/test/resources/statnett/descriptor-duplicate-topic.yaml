@@ -1,0 +1,12 @@
+---
+context: "contextOrg"
+source: "source"
+projects:
+  - name: "foo"
+    topics:
+      - name: "foo"
+      - name: "foo"
+      - name: "bar"
+  - name: "bar"
+    topics:
+      - name: "bar"

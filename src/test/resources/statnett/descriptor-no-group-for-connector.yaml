@@ -1,0 +1,17 @@
+---
+context: "contextOrg"
+source: "source"
+projects:
+  - name: "foo"
+    connectors:
+      - principal: "User:Connect1"
+        topics:
+          write:
+            - "foo"
+      - principal: "User:Connect2"
+        topics:
+          read:
+            - "bar"
+    topics:
+      - name: "foo"
+      - name: "bar"
