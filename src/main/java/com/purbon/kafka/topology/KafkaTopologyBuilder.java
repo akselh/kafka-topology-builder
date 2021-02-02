@@ -121,11 +121,11 @@ public class KafkaTopologyBuilder implements AutoCloseable {
     TopologyValidator validator = new TopologyValidator(config);
     List<String> validationResults = validator.validate(topology);
     if (!validationResults.isEmpty()) {
-      String resultsMessage = String.join("\n", "\\033[31m" + validationResults + "\\033[39m");
+      String resultsMessage = String.join("\n", validationResults);
       LOGGER.error("Validation of topology failed: \n" + resultsMessage);
 
-      resultsMessage = String.join("\n", "\\e[91m" + validationResults + "\\e[39m");
-      LOGGER.error("Validation of topology failed: \n" + resultsMessage);
+//      resultsMessage = String.join("\n", "\e[91m" + validationResults + "\e[39m");
+//      LOGGER.error("Validation of topology failed: \n" + resultsMessage);
       throw new ValidationException("Validation of topology failed. Please check the log for details.");
     }
     config.validateWith(topology);

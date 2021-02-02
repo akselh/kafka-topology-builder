@@ -3,9 +3,12 @@ Configuration:
 
   appenders:
     Console:
-      name: LogToConsole
+    - name: LogToConsole
       PatternLayout:
         Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+    - name: LogToConsoleColorRed
+      PatternLayout:
+        Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - e[91m%msge[39m%n"
 
     RollingFile:
     - name: LogToRollingFile
@@ -38,6 +41,12 @@ Configuration:
         additivity: true
         AppenderRef:
           - ref: LogToConsole
+          - ref: LogToRollingFile
+      - name: com.purbon.kafka.topology.KafkaTopologyBuilder
+        level: error
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsoleColorRed
           - ref: LogToRollingFile
     Root:
       level: info
