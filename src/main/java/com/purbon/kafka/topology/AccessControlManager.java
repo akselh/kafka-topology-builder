@@ -69,9 +69,10 @@ public class AccessControlManager implements ExecutionPlanUpdater {
    */
   @Override
   public void updatePlan(ExecutionPlan plan, final Topology topology) throws IOException {
-    List<Action> actions = buildProjectActions(topology);
-    actions.addAll(buildPlatformLevelActions(topology));
-    buildUpdateBindingsActions(actions, loadActualClusterStateIfAvailable(plan)).forEach(plan::add);
+    List<AclBindingsOrError> aclBindingsOrErrors = buildProjectAclBindings(topology);
+    aclBindingsOrErrors.addAll(buildPlatformLevelActions(topology));
+    buildUpdateBindingsActions(aclBindingsOrErrors, loadActualClusterStateIfAvailable(plan))
+        .forEach(plan::add);
   }
 
   private Set<TopologyAclBinding> loadActualClusterStateIfAvailable(ExecutionPlan plan) {
@@ -100,63 +101,69 @@ public class AccessControlManager implements ExecutionPlanUpdater {
    * @param topology A topology file
    * @return List<Action> A list of actions required based on the parameters
    */
-  private List<Action> buildProjectActions(Topology topology) {
-    List<Action> actions = new ArrayList<>();
+  private List<AclBindingsOrError> buildProjectAclBindings(Topology topology) {
+    List<AclBindingsOrError> aclBindingsOrErrors = new ArrayList<>();
 
     for (Project project : topology.getProjects()) {
       if (config.shouldOptimizeAcls()) {
-        actions.addAll(buildOptimizeConsumerAndProducerAcls(project));
+        aclBindingsOrErrors.addAll(buildOptimizeConsumerAndProducerAcls(project));
       } else {
-        actions.addAll(buildDetailedConsumerAndProducerAcls(project));
+        aclBindingsOrErrors.addAll(buildDetailedConsumerAndProducerAcls(project));
       }
       // Setup global Kafka Stream Access control lists
       String topicPrefix = project.namePrefix();
       for (KStream app : project.getStreams()) {
-        syncApplicationAcls(app, topicPrefix).ifPresent(actions::add);
+        syncApplicationAcls(app, topicPrefix).ifPresent(aclBindingsOrErrors::add);
       }
       for (KSqlApp kSqlApp : project.getKSqls()) {
-        syncApplicationAcls(kSqlApp, topicPrefix).ifPresent(actions::add);
+        syncApplicationAcls(kSqlApp, topicPrefix).ifPresent(aclBindingsOrErrors::add);
       }
       for (Connector connector : project.getConnectors()) {
-        syncApplicationAcls(connector, topicPrefix).ifPresent(actions::add);
+        syncApplicationAcls(connector, topicPrefix).ifPresent(aclBindingsOrErrors::add);
         connector
             .getConnectors()
             .ifPresent(
                 (list) -> {
-                  actions.add(
-                      new BuildBindingsForConnectorAuthorization(bindingsBuilder, connector));
+                  aclBindingsOrErrors.add(
+                      new BuildBindingsForConnectorAuthorization(bindingsBuilder, connector)
+                          .getAclBindingsOrError());
                 });
       }
 
       for (Schemas schemaAuthorization : project.getSchemas()) {
-        actions.add(new BuildBindingsForSchemaAuthorization(bindingsBuilder, schemaAuthorization));
+        aclBindingsOrErrors.add(
+            new BuildBindingsForSchemaAuthorization(bindingsBuilder, schemaAuthorization)
+                .getAclBindingsOrError());
       }
 
-      syncRbacRawRoles(project.getRbacRawRoles(), topicPrefix, actions);
+      syncRbacRawRoles(project.getRbacRawRoles(), topicPrefix, aclBindingsOrErrors);
     }
-    return actions;
+    return aclBindingsOrErrors;
   }
 
-  private List<Action> buildOptimizeConsumerAndProducerAcls(Project project) {
-    List<Action> actions = new ArrayList<>();
-    actions.add(
+  private List<AclBindingsOrError> buildOptimizeConsumerAndProducerAcls(Project project) {
+    List<AclBindingsOrError> aclBindingsOrErrors = new ArrayList<>();
+    aclBindingsOrErrors.add(
         new BuildBindingsForConsumer(
-            bindingsBuilder, project.getConsumers(), project.namePrefix(), true));
-    actions.add(
+                bindingsBuilder, project.getConsumers(), project.namePrefix(), true)
+            .getAclBindingsOrError());
+    aclBindingsOrErrors.add(
         new BuildBindingsForProducer(
-            bindingsBuilder, project.getProducers(), project.namePrefix(), true));
+                bindingsBuilder, project.getProducers(), project.namePrefix(), true)
+            .getAclBindingsOrError());
 
     // When optimised, still need to add any topic level specific.
-    actions.addAll(buildBasicUsersAcls(project, false));
-    return actions;
+    aclBindingsOrErrors.addAll(buildBasicUsersAcls(project, false));
+    return aclBindingsOrErrors;
   }
 
-  private List<Action> buildDetailedConsumerAndProducerAcls(Project project) {
+  private List<AclBindingsOrError> buildDetailedConsumerAndProducerAcls(Project project) {
     return buildBasicUsersAcls(project, true);
   }
 
-  private List<Action> buildBasicUsersAcls(Project project, boolean includeProjectLevel) {
-    List<Action> actions = new ArrayList<>();
+  private List<AclBindingsOrError> buildBasicUsersAcls(
+      Project project, boolean includeProjectLevel) {
+    List<AclBindingsOrError> aclBindingsOrErrors = new ArrayList<>();
     project
         .getTopics()
         .forEach(
@@ -167,60 +174,60 @@ public class AccessControlManager implements ExecutionPlanUpdater {
                 consumers.addAll(project.getConsumers());
               }
               if (!consumers.isEmpty()) {
-                Action action =
+                AclBindingsOrError aclBindingsOrError =
                     new BuildBindingsForConsumer(
-                        bindingsBuilder, new ArrayList<>(consumers), fullTopicName, false);
-                actions.add(action);
+                            bindingsBuilder, new ArrayList<>(consumers), fullTopicName, false)
+                        .getAclBindingsOrError();
+                aclBindingsOrErrors.add(aclBindingsOrError);
               }
               Set<Producer> producers = new HashSet(topic.getProducers());
               if (includeProjectLevel) {
                 producers.addAll(project.getProducers());
               }
               if (!producers.isEmpty()) {
-                Action action =
+                AclBindingsOrError aclBindingsOrError =
                     new BuildBindingsForProducer(
-                        bindingsBuilder, new ArrayList<>(producers), fullTopicName, false);
-                actions.add(action);
+                            bindingsBuilder, new ArrayList<>(producers), fullTopicName, false)
+                        .getAclBindingsOrError();
+                aclBindingsOrErrors.add(aclBindingsOrError);
               }
             });
-    return actions;
+    return aclBindingsOrErrors;
   }
 
   /**
    * Build a list of actions required to create or delete necessary bindings
    *
-   * @param actions List of pre computed actions based on a topology
+   * @param aclBindingsOrErrors List of pre computed actions based on a topology
    * @param bindings List of current bindings available in the cluster
    * @return List<Action> list of actions necessary to update the cluster
    */
   private List<Action> buildUpdateBindingsActions(
-      List<Action> actions, Set<TopologyAclBinding> bindings) throws IOException {
+      List<AclBindingsOrError> aclBindingsOrErrors, Set<TopologyAclBinding> bindings)
+      throws IOException {
 
     List<Action> updateActions = new ArrayList<>();
 
     List<Either> eitherStreamOrError =
-        actions.stream()
+        aclBindingsOrErrors.stream()
             .map(
-                action -> {
-                  try {
-                    action.run();
-                    return Either.Left(action.getBindings().stream());
-                  } catch (IOException e) {
-                    return Either.Right(e);
-                  }
+                aclBindingsOrError -> {
+                  return aclBindingsOrError.isError()
+                      ? Either.Right(aclBindingsOrError.getErrorMessage())
+                      : Either.Left(aclBindingsOrError.getAclBindings().stream());
                 })
             .collect(Collectors.toList());
 
-    List<IOException> errors =
+    List<String> errorMessages =
         eitherStreamOrError.stream()
             .filter(Either::isRight)
-            .map(e -> (IOException) e.getRight().get())
+            .map(e -> (String) e.getRight().get())
             .collect(Collectors.toList());
-    if (!errors.isEmpty()) {
-      for (IOException err : errors) {
-        LOGGER.error(err);
+    if (!errorMessages.isEmpty()) {
+      for (String errorMessage : errorMessages) {
+        LOGGER.error(errorMessage);
       }
-      throw errors.get(0);
+      throw new IOException(errorMessages.get(0));
     }
 
     Set<TopologyAclBinding> allFinalBindings =
@@ -295,63 +302,82 @@ public class AccessControlManager implements ExecutionPlanUpdater {
   }
 
   // Sync platform relevant Access Control List.
-  private List<Action> buildPlatformLevelActions(final Topology topology) {
-    List<Action> actions = new ArrayList<>();
+  private List<AclBindingsOrError> buildPlatformLevelActions(final Topology topology) {
+    List<AclBindingsOrError> aclBindingsOrErrors = new ArrayList<>();
     Platform platform = topology.getPlatform();
 
     // Set cluster level ACLs
-    syncClusterLevelRbac(platform.getKafka().getRbac(), KAFKA, actions);
-    syncClusterLevelRbac(platform.getKafkaConnect().getRbac(), KAFKA_CONNECT, actions);
-    syncClusterLevelRbac(platform.getSchemaRegistry().getRbac(), SCHEMA_REGISTRY, actions);
+    syncClusterLevelRbac(platform.getKafka().getRbac(), KAFKA, aclBindingsOrErrors);
+    syncClusterLevelRbac(platform.getKafkaConnect().getRbac(), KAFKA_CONNECT, aclBindingsOrErrors);
+    syncClusterLevelRbac(
+        platform.getSchemaRegistry().getRbac(), SCHEMA_REGISTRY, aclBindingsOrErrors);
 
     // Set component level ACLs
     for (SchemaRegistryInstance schemaRegistry : platform.getSchemaRegistry().getInstances()) {
-      actions.add(new BuildBindingsForSchemaRegistry(bindingsBuilder, schemaRegistry));
+      aclBindingsOrErrors.add(
+          new BuildBindingsForSchemaRegistry(bindingsBuilder, schemaRegistry)
+              .getAclBindingsOrError());
     }
     for (ControlCenterInstance controlCenter : platform.getControlCenter().getInstances()) {
-      actions.add(new BuildBindingsForControlCenter(bindingsBuilder, controlCenter));
+      aclBindingsOrErrors.add(
+          new BuildBindingsForControlCenter(bindingsBuilder, controlCenter)
+              .getAclBindingsOrError());
     }
 
     for (KsqlServerInstance ksqlServer : platform.getKsqlServer().getInstances()) {
-      actions.add(new BuildBindingsForKSqlServer(bindingsBuilder, ksqlServer));
+      aclBindingsOrErrors.add(
+          new BuildBindingsForKSqlServer(bindingsBuilder, ksqlServer).getAclBindingsOrError());
     }
 
-    return actions;
+    return aclBindingsOrErrors;
   }
 
   private void syncClusterLevelRbac(
-      Optional<Map<String, List<User>>> rbac, Component cmp, List<Action> actions) {
+      Optional<Map<String, List<User>>> rbac,
+      Component cmp,
+      List<AclBindingsOrError> aclBindingsOrErrors) {
     if (rbac.isPresent()) {
       Map<String, List<User>> roles = rbac.get();
       for (String role : roles.keySet()) {
         for (User user : roles.get(role)) {
-          actions.add(new BuildClusterLevelBinding(bindingsBuilder, role, user, cmp));
+          aclBindingsOrErrors.add(
+              new BuildClusterLevelBinding(bindingsBuilder, role, user, cmp)
+                  .getAclBindingsOrError());
         }
       }
     }
   }
 
   private void syncRbacRawRoles(
-      Map<String, List<String>> rbacRawRoles, String topicPrefix, List<Action> actions) {
+      Map<String, List<String>> rbacRawRoles,
+      String topicPrefix,
+      List<AclBindingsOrError> aclBindingsOrErrors) {
     rbacRawRoles.forEach(
         (predefinedRole, principals) ->
             principals.forEach(
                 principal ->
-                    actions.add(
+                    aclBindingsOrErrors.add(
                         new BuildPredefinedBinding(
-                            bindingsBuilder, principal, predefinedRole, topicPrefix))));
+                                bindingsBuilder, principal, predefinedRole, topicPrefix)
+                            .getAclBindingsOrError())));
   }
 
-  private Optional<Action> syncApplicationAcls(DynamicUser app, String topicPrefix) {
-    Action action = null;
+  private Optional<AclBindingsOrError> syncApplicationAcls(DynamicUser app, String topicPrefix) {
+    AclBindingsOrError aclBindingsOrError = null;
     if (app instanceof KStream) {
-      action = new BuildBindingsForKStreams(bindingsBuilder, (KStream) app, topicPrefix);
+      aclBindingsOrError =
+          new BuildBindingsForKStreams(bindingsBuilder, (KStream) app, topicPrefix)
+              .getAclBindingsOrError();
     } else if (app instanceof Connector) {
-      action = new BuildBindingsForKConnect(bindingsBuilder, (Connector) app, topicPrefix);
+      aclBindingsOrError =
+          new BuildBindingsForKConnect(bindingsBuilder, (Connector) app, topicPrefix)
+              .getAclBindingsOrError();
     } else if (app instanceof KSqlApp) {
-      action = new BuildBindingsForKSqlApp(bindingsBuilder, (KSqlApp) app, topicPrefix);
+      aclBindingsOrError =
+          new BuildBindingsForKSqlApp(bindingsBuilder, (KSqlApp) app, topicPrefix)
+              .getAclBindingsOrError();
     }
-    return Optional.ofNullable(action);
+    return Optional.ofNullable(aclBindingsOrError);
   }
 
   @Override

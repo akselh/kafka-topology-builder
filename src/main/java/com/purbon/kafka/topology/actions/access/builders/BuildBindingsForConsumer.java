@@ -1,13 +1,10 @@
 package com.purbon.kafka.topology.actions.access.builders;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.actions.BaseAccessControlAction;
 import com.purbon.kafka.topology.model.users.Consumer;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class BuildBindingsForConsumer extends BaseAccessControlAction {
+public class BuildBindingsForConsumer implements AclBindingsOrErrorBuilder {
 
   private final String fullTopicName;
   private final List<Consumer> consumers;
@@ -19,7 +16,6 @@ public class BuildBindingsForConsumer extends BaseAccessControlAction {
       List<Consumer> consumers,
       String fullTopicName,
       boolean prefixed) {
-    super();
     this.consumers = consumers;
     this.fullTopicName = fullTopicName;
     this.builderProvider = builderProvider;
@@ -27,16 +23,8 @@ public class BuildBindingsForConsumer extends BaseAccessControlAction {
   }
 
   @Override
-  protected void execute() {
-    bindings = builderProvider.buildBindingsForConsumers(consumers, fullTopicName, prefixed);
-  }
-
-  @Override
-  protected Map<String, Object> props() {
-    Map<String, Object> map = new HashMap<>();
-    map.put("Operation", getClass().getName());
-    map.put("Principals", consumers);
-    map.put("Topic", fullTopicName);
-    return map;
+  public AclBindingsOrError getAclBindingsOrError() {
+    return AclBindingsOrError.forAclBindings(
+        builderProvider.buildBindingsForConsumers(consumers, fullTopicName, prefixed));
   }
 }

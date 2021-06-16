@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.purbon.kafka.topology.Configuration;
 import com.purbon.kafka.topology.model.users.KStream;
 import com.purbon.kafka.topology.roles.acls.AclsBindingsBuilder;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ import org.junit.Test;
 
 public class BuildBindingsForKStreamsTest {
 
-  private BuildBindingsForKStreams action;
+  private BuildBindingsForKStreams builder;
   private AclsBindingsBuilder aclsBindingsBuilder;
 
   @Before
@@ -25,21 +24,20 @@ public class BuildBindingsForKStreamsTest {
   }
 
   @Test
-  public void testStreamsWithoutApplicationId() throws IOException {
+  public void testStreamsWithoutApplicationId() {
     HashMap<String, List<String>> topics = new HashMap<>();
     topics.put(KStream.READ_TOPICS, singletonList("topicA"));
     topics.put(KStream.WRITE_TOPICS, singletonList("topicB"));
 
     KStream app = new KStream("User:user", topics);
     String topicPrefix = "topicPrefix";
-    action = new BuildBindingsForKStreams(aclsBindingsBuilder, app, topicPrefix);
-    action.execute();
-    assertThat(action.getBindings())
+    builder = new BuildBindingsForKStreams(aclsBindingsBuilder, app, topicPrefix);
+    assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.TOPIC.name()
                     && b.getResourceName().equals(topicPrefix));
-    assertThat(action.getBindings())
+    assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.GROUP.name()
@@ -47,21 +45,20 @@ public class BuildBindingsForKStreamsTest {
   }
 
   @Test
-  public void testStreamWithApplicationId() throws IOException {
+  public void testStreamWithApplicationId() {
     HashMap<String, List<String>> topics = new HashMap<>();
     topics.put(KStream.READ_TOPICS, singletonList("topicA"));
     topics.put(KStream.WRITE_TOPICS, singletonList("topicB"));
 
     String applicationId = "applicationId";
     KStream app = new KStream("User:user", topics, Optional.of(applicationId));
-    action = new BuildBindingsForKStreams(aclsBindingsBuilder, app, "topicPrefix");
-    action.execute();
-    assertThat(action.getBindings())
+    builder = new BuildBindingsForKStreams(aclsBindingsBuilder, app, "topicPrefix");
+    assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.TOPIC.name()
                     && b.getResourceName().equals(applicationId));
-    assertThat(action.getBindings())
+    assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.GROUP.name()

@@ -2,7 +2,6 @@ package com.purbon.kafka.topology;
 
 import static com.purbon.kafka.topology.CommandLineInterface.*;
 import static com.purbon.kafka.topology.Constants.*;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.*;
 
 import com.purbon.kafka.topology.BackendController.Mode;

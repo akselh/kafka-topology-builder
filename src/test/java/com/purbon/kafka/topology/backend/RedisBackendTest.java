@@ -3,8 +3,6 @@ package com.purbon.kafka.topology.backend;
 import static com.purbon.kafka.topology.backend.RedisBackend.JULIE_OPS_BINDINGS;
 import static com.purbon.kafka.topology.backend.RedisBackend.JULIE_OPS_TYPE;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.purbon.kafka.topology.roles.TopologyAclBinding;
