@@ -1,4 +1,4 @@
-package com.purbon.kafka.topology.actions.access.builders;
+package com.purbon.kafka.topology.aclbindingbuilders;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.KSqlApp;

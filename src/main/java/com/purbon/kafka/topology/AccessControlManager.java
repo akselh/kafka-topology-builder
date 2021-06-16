@@ -2,11 +2,11 @@ package com.purbon.kafka.topology;
 
 import static com.purbon.kafka.topology.model.Component.*;
 
+import com.purbon.kafka.topology.aclbindingbuilders.*;
+import com.purbon.kafka.topology.aclbindingbuilders.rbac.*;
 import com.purbon.kafka.topology.actions.Action;
 import com.purbon.kafka.topology.actions.access.ClearBindings;
 import com.purbon.kafka.topology.actions.access.CreateBindings;
-import com.purbon.kafka.topology.actions.access.builders.*;
-import com.purbon.kafka.topology.actions.access.builders.rbac.*;
 import com.purbon.kafka.topology.model.Component;
 import com.purbon.kafka.topology.model.DynamicUser;
 import com.purbon.kafka.topology.model.Platform;
