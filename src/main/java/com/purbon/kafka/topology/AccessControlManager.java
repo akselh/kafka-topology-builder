@@ -23,12 +23,10 @@ import com.purbon.kafka.topology.model.users.platform.ControlCenterInstance;
 import com.purbon.kafka.topology.model.users.platform.KsqlServerInstance;
 import com.purbon.kafka.topology.model.users.platform.SchemaRegistryInstance;
 import com.purbon.kafka.topology.roles.TopologyAclBinding;
-import com.purbon.kafka.topology.utils.Either;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -208,20 +206,10 @@ public class AccessControlManager implements ExecutionPlanUpdater {
 
     List<Action> updateActions = new ArrayList<>();
 
-    List<Either> eitherStreamOrError =
+    final List<String> errorMessages =
         aclBindingsOrErrors.stream()
-            .map(
-                aclBindingsOrError -> {
-                  return aclBindingsOrError.isError()
-                      ? Either.Right(aclBindingsOrError.getErrorMessage())
-                      : Either.Left(aclBindingsOrError.getAclBindings().stream());
-                })
-            .collect(Collectors.toList());
-
-    List<String> errorMessages =
-        eitherStreamOrError.stream()
-            .filter(Either::isRight)
-            .map(e -> (String) e.getRight().get())
+            .filter(AclBindingsOrError::isError)
+            .map(AclBindingsOrError::getErrorMessage)
             .collect(Collectors.toList());
     if (!errorMessages.isEmpty()) {
       for (String errorMessage : errorMessages) {
@@ -231,9 +219,8 @@ public class AccessControlManager implements ExecutionPlanUpdater {
     }
 
     Set<TopologyAclBinding> allFinalBindings =
-        eitherStreamOrError.stream()
-            .filter(Either::isLeft)
-            .flatMap(e -> (Stream<TopologyAclBinding>) e.getLeft().get())
+        aclBindingsOrErrors.stream()
+            .flatMap(aboe -> aboe.getAclBindings().stream())
             .collect(Collectors.toSet());
 
     Set<TopologyAclBinding> bindingsToBeCreated =
