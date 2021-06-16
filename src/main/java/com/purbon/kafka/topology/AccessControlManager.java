@@ -125,14 +125,14 @@ public class AccessControlManager implements ExecutionPlanUpdater {
             .ifPresent(
                 (list) -> {
                   aclBindingsOrErrors.add(
-                      new BuildBindingsForConnectorAuthorization(bindingsBuilder, connector)
+                      new ConnectorAuthorizationAclBindingsBuilder(bindingsBuilder, connector)
                           .getAclBindingsOrError());
                 });
       }
 
       for (Schemas schemaAuthorization : project.getSchemas()) {
         aclBindingsOrErrors.add(
-            new BuildBindingsForSchemaAuthorization(bindingsBuilder, schemaAuthorization)
+            new SchemaAuthorizationAclBindingsBuilder(bindingsBuilder, schemaAuthorization)
                 .getAclBindingsOrError());
       }
 
@@ -144,11 +144,11 @@ public class AccessControlManager implements ExecutionPlanUpdater {
   private List<AclBindingsOrError> buildOptimizeConsumerAndProducerAcls(Project project) {
     List<AclBindingsOrError> aclBindingsOrErrors = new ArrayList<>();
     aclBindingsOrErrors.add(
-        new BuildBindingsForConsumer(
+        new ConsumerAclBindingsBuilder(
                 bindingsBuilder, project.getConsumers(), project.namePrefix(), true)
             .getAclBindingsOrError());
     aclBindingsOrErrors.add(
-        new BuildBindingsForProducer(
+        new ProducerAclBindingsBuilder(
                 bindingsBuilder, project.getProducers(), project.namePrefix(), true)
             .getAclBindingsOrError());
 
@@ -175,7 +175,7 @@ public class AccessControlManager implements ExecutionPlanUpdater {
               }
               if (!consumers.isEmpty()) {
                 AclBindingsOrError aclBindingsOrError =
-                    new BuildBindingsForConsumer(
+                    new ConsumerAclBindingsBuilder(
                             bindingsBuilder, new ArrayList<>(consumers), fullTopicName, false)
                         .getAclBindingsOrError();
                 aclBindingsOrErrors.add(aclBindingsOrError);
@@ -186,7 +186,7 @@ public class AccessControlManager implements ExecutionPlanUpdater {
               }
               if (!producers.isEmpty()) {
                 AclBindingsOrError aclBindingsOrError =
-                    new BuildBindingsForProducer(
+                    new ProducerAclBindingsBuilder(
                             bindingsBuilder, new ArrayList<>(producers), fullTopicName, false)
                         .getAclBindingsOrError();
                 aclBindingsOrErrors.add(aclBindingsOrError);
@@ -315,18 +315,18 @@ public class AccessControlManager implements ExecutionPlanUpdater {
     // Set component level ACLs
     for (SchemaRegistryInstance schemaRegistry : platform.getSchemaRegistry().getInstances()) {
       aclBindingsOrErrors.add(
-          new BuildBindingsForSchemaRegistry(bindingsBuilder, schemaRegistry)
+          new SchemaRegistryAclBindingsBuilder(bindingsBuilder, schemaRegistry)
               .getAclBindingsOrError());
     }
     for (ControlCenterInstance controlCenter : platform.getControlCenter().getInstances()) {
       aclBindingsOrErrors.add(
-          new BuildBindingsForControlCenter(bindingsBuilder, controlCenter)
+          new ControlCenterAclBindingsBuilder(bindingsBuilder, controlCenter)
               .getAclBindingsOrError());
     }
 
     for (KsqlServerInstance ksqlServer : platform.getKsqlServer().getInstances()) {
       aclBindingsOrErrors.add(
-          new BuildBindingsForKSqlServer(bindingsBuilder, ksqlServer).getAclBindingsOrError());
+          new KSqlServerAclBindingsBuilder(bindingsBuilder, ksqlServer).getAclBindingsOrError());
     }
 
     return aclBindingsOrErrors;
@@ -341,7 +341,7 @@ public class AccessControlManager implements ExecutionPlanUpdater {
       for (String role : roles.keySet()) {
         for (User user : roles.get(role)) {
           aclBindingsOrErrors.add(
-              new BuildClusterLevelBinding(bindingsBuilder, role, user, cmp)
+              new ClusterLevelAclBindingsBuilder(bindingsBuilder, role, user, cmp)
                   .getAclBindingsOrError());
         }
       }
@@ -357,7 +357,7 @@ public class AccessControlManager implements ExecutionPlanUpdater {
             principals.forEach(
                 principal ->
                     aclBindingsOrErrors.add(
-                        new BuildPredefinedBinding(
+                        new PredefinedAclBindingsBuilder(
                                 bindingsBuilder, principal, predefinedRole, topicPrefix)
                             .getAclBindingsOrError())));
   }
@@ -366,15 +366,15 @@ public class AccessControlManager implements ExecutionPlanUpdater {
     AclBindingsOrError aclBindingsOrError = null;
     if (app instanceof KStream) {
       aclBindingsOrError =
-          new BuildBindingsForKStreams(bindingsBuilder, (KStream) app, topicPrefix)
+          new KStreamsAclBindingsBuilder(bindingsBuilder, (KStream) app, topicPrefix)
               .getAclBindingsOrError();
     } else if (app instanceof Connector) {
       aclBindingsOrError =
-          new BuildBindingsForKConnect(bindingsBuilder, (Connector) app, topicPrefix)
+          new KConnectAclBindingsBuilder(bindingsBuilder, (Connector) app, topicPrefix)
               .getAclBindingsOrError();
     } else if (app instanceof KSqlApp) {
       aclBindingsOrError =
-          new BuildBindingsForKSqlApp(bindingsBuilder, (KSqlApp) app, topicPrefix)
+          new KSqlAppAclBindingsBuilder(bindingsBuilder, (KSqlApp) app, topicPrefix)
               .getAclBindingsOrError();
     }
     return Optional.ofNullable(aclBindingsOrError);

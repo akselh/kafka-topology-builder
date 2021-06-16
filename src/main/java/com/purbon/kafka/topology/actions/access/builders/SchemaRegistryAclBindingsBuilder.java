@@ -4,12 +4,12 @@ import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.exceptions.ConfigurationException;
 import com.purbon.kafka.topology.model.users.platform.SchemaRegistryInstance;
 
-public class BuildBindingsForSchemaRegistry implements AclBindingsOrErrorBuilder {
+public class SchemaRegistryAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final SchemaRegistryInstance schemaRegistry;
 
-  public BuildBindingsForSchemaRegistry(
+  public SchemaRegistryAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, SchemaRegistryInstance schemaRegistry) {
     this.builderProvider = builderProvider;
     this.schemaRegistry = schemaRegistry;

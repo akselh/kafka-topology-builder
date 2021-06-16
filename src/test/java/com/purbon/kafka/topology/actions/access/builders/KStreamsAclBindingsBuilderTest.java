@@ -13,9 +13,9 @@ import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BuildBindingsForKStreamsTest {
+public class KStreamsAclBindingsBuilderTest {
 
-  private BuildBindingsForKStreams builder;
+  private KStreamsAclBindingsBuilder builder;
   private AclsBindingsBuilder aclsBindingsBuilder;
 
   @Before
@@ -31,7 +31,7 @@ public class BuildBindingsForKStreamsTest {
 
     KStream app = new KStream("User:user", topics);
     String topicPrefix = "topicPrefix";
-    builder = new BuildBindingsForKStreams(aclsBindingsBuilder, app, topicPrefix);
+    builder = new KStreamsAclBindingsBuilder(aclsBindingsBuilder, app, topicPrefix);
     assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->
@@ -52,7 +52,7 @@ public class BuildBindingsForKStreamsTest {
 
     String applicationId = "applicationId";
     KStream app = new KStream("User:user", topics, Optional.of(applicationId));
-    builder = new BuildBindingsForKStreams(aclsBindingsBuilder, app, "topicPrefix");
+    builder = new KStreamsAclBindingsBuilder(aclsBindingsBuilder, app, "topicPrefix");
     assertThat(builder.getAclBindingsOrError().getAclBindings())
         .anyMatch(
             b ->

@@ -3,13 +3,13 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.KSqlApp;
 
-public class BuildBindingsForKSqlApp implements AclBindingsOrErrorBuilder {
+public class KSqlAppAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final KSqlApp app;
   private final String prefix;
 
-  public BuildBindingsForKSqlApp(
+  public KSqlAppAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, KSqlApp app, String topicPrefix) {
     this.builderProvider = builderProvider;
     this.app = app;

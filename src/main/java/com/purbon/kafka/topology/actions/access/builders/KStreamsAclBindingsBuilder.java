@@ -3,13 +3,13 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.KStream;
 
-public class BuildBindingsForKStreams implements AclBindingsOrErrorBuilder {
+public class KStreamsAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final KStream app;
   private final String prefix;
 
-  public BuildBindingsForKStreams(
+  public KStreamsAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, KStream app, String topicPrefix) {
     this.builderProvider = builderProvider;
     this.app = app;

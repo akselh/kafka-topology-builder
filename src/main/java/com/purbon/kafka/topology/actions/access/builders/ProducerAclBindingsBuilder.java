@@ -1,30 +1,30 @@
 package com.purbon.kafka.topology.actions.access.builders;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.model.users.Consumer;
+import com.purbon.kafka.topology.model.users.Producer;
 import java.util.List;
 
-public class BuildBindingsForConsumer implements AclBindingsOrErrorBuilder {
+public class ProducerAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
-  private final String fullTopicName;
-  private final List<Consumer> consumers;
   private final BindingsBuilderProvider builderProvider;
-  private boolean prefixed;
+  private final List<Producer> producers;
+  private final String fullTopicName;
+  private final boolean prefixed;
 
-  public BuildBindingsForConsumer(
+  public ProducerAclBindingsBuilder(
       BindingsBuilderProvider builderProvider,
-      List<Consumer> consumers,
+      List<Producer> producers,
       String fullTopicName,
       boolean prefixed) {
-    this.consumers = consumers;
-    this.fullTopicName = fullTopicName;
     this.builderProvider = builderProvider;
+    this.producers = producers;
+    this.fullTopicName = fullTopicName;
     this.prefixed = prefixed;
   }
 
   @Override
   public AclBindingsOrError getAclBindingsOrError() {
     return AclBindingsOrError.forAclBindings(
-        builderProvider.buildBindingsForConsumers(consumers, fullTopicName, prefixed));
+        builderProvider.buildBindingsForProducers(producers, fullTopicName, prefixed));
   }
 }

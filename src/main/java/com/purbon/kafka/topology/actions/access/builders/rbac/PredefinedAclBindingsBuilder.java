@@ -5,14 +5,14 @@ import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrError;
 import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuilder;
 import java.util.Collections;
 
-public class BuildPredefinedBinding implements AclBindingsOrErrorBuilder {
+public class PredefinedAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final String principal;
   private final String predefinedRole;
   private final String topicPrefix;
 
-  public BuildPredefinedBinding(
+  public PredefinedAclBindingsBuilder(
       BindingsBuilderProvider builderProvider,
       String principal,
       String predefinedRole,

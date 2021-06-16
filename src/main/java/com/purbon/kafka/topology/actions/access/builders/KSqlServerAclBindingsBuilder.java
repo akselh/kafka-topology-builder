@@ -3,12 +3,12 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.platform.KsqlServerInstance;
 
-public class BuildBindingsForKSqlServer implements AclBindingsOrErrorBuilder {
+public class KSqlServerAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final KsqlServerInstance ksqlServer;
 
-  public BuildBindingsForKSqlServer(
+  public KSqlServerAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, KsqlServerInstance ksqlServer) {
     this.builderProvider = builderProvider;
     this.ksqlServer = ksqlServer;

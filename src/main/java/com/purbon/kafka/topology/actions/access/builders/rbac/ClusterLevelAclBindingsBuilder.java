@@ -7,14 +7,14 @@ import com.purbon.kafka.topology.model.Component;
 import com.purbon.kafka.topology.model.User;
 import java.io.IOException;
 
-public class BuildClusterLevelBinding implements AclBindingsOrErrorBuilder {
+public class ClusterLevelAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final String role;
   private final User user;
   private final Component cmp;
   private final BindingsBuilderProvider builderProvider;
 
-  public BuildClusterLevelBinding(
+  public ClusterLevelAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, String role, User user, Component cmp) {
     this.builderProvider = builderProvider;
     this.role = role;

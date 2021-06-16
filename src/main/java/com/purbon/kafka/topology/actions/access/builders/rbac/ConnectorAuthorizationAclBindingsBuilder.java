@@ -6,12 +6,12 @@ import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuild
 import com.purbon.kafka.topology.model.users.Connector;
 import java.util.ArrayList;
 
-public class BuildBindingsForConnectorAuthorization implements AclBindingsOrErrorBuilder {
+public class ConnectorAuthorizationAclBindingsBuilder implements AclBindingsOrErrorBuilder {
 
   private final Connector connector;
   private final BindingsBuilderProvider builderProvider;
 
-  public BuildBindingsForConnectorAuthorization(
+  public ConnectorAuthorizationAclBindingsBuilder(
       BindingsBuilderProvider builderProvider, Connector connector) {
     this.builderProvider = builderProvider;
     this.connector = connector;
