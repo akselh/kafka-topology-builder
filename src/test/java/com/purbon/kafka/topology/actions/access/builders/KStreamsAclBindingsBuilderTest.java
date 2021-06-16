@@ -1,4 +1,4 @@
-package com.purbon.kafka.topology.aclbindingbuilders;
+package com.purbon.kafka.topology.actions.access.builders;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;

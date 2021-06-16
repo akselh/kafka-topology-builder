@@ -1,4 +1,4 @@
-package com.purbon.kafka.topology.aclbindingbuilders;
+package com.purbon.kafka.topology.actions.access.builders;
 
 public interface AclBindingsOrErrorBuilder {
 

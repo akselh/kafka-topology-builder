@@ -1,8 +1,8 @@
-package com.purbon.kafka.topology.aclbindingbuilders.rbac;
+package com.purbon.kafka.topology.actions.access.builders.rbac;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.aclbindingbuilders.AclBindingsOrError;
-import com.purbon.kafka.topology.aclbindingbuilders.AclBindingsOrErrorBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrError;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuilder;
 import java.util.Collections;
 
 public class PredefinedAclBindingsBuilder implements AclBindingsOrErrorBuilder {
