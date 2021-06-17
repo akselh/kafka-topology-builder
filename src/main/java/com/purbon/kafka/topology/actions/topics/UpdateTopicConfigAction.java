@@ -30,11 +30,11 @@ public class UpdateTopicConfigAction extends BaseAction {
 
   @Override
   public void run() throws IOException {
-    syncConfig(topic, fullTopicName);
+    updateConfig(topic, fullTopicName);
   }
 
-  private void syncConfig(Topic topic, String fullTopicName) throws IOException {
-    LOGGER.debug(String.format("Sync topic %s", fullTopicName));
+  private void updateConfig(Topic topic, String fullTopicName) throws IOException {
+    LOGGER.debug(String.format("Update config for topic %s", fullTopicName));
     if (topic.partitionsCount() > adminClient.getPartitionCount(fullTopicName)) {
       LOGGER.debug(String.format("Update partition count of topic %s", fullTopicName));
       adminClient.updatePartitionCount(topic, fullTopicName);

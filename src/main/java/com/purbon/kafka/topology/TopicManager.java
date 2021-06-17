@@ -59,18 +59,18 @@ public class TopicManager implements ManagerOfThings {
     Map<String, Topic> topics = parseMapOfTopics(topology);
 
     Set<Action> createTopicActions = new HashSet<>();
-    Set<Action> syncTopicConfigActions = new HashSet<>();
+    Set<Action> updateTopicConfigActions = new HashSet<>();
     topics.forEach(
         (topicName, topic) -> {
           if (currentTopics.contains(topicName)) {
-            syncTopicConfigActions.add(new UpdateTopicConfigAction(adminClient, topic, topicName));
+            updateTopicConfigActions.add(new UpdateTopicConfigAction(adminClient, topic, topicName));
           } else {
             createTopicActions.add(new CreateTopicAction(adminClient, topic, topicName));
           }
         });
 
     createTopicActions.forEach(plan::add); // Do createActions before update actions
-    syncTopicConfigActions.forEach(plan::add);
+    updateTopicConfigActions.forEach(plan::add);
 
     topics.forEach(
         (topicName, topic) -> {
