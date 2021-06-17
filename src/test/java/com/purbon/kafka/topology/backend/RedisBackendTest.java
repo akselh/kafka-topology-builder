@@ -31,7 +31,7 @@ public class RedisBackendTest {
   }
 
   @Test
-  public void testSaveBindings() throws IOException {
+  public void testSaveBindings() {
 
     TopologyAclBinding binding =
         TopologyAclBinding.build(

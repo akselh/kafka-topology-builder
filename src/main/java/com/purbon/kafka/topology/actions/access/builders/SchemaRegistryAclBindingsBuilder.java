@@ -1,7 +1,6 @@
 package com.purbon.kafka.topology.actions.access.builders;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.exceptions.ConfigurationException;
 import com.purbon.kafka.topology.model.users.platform.SchemaRegistryInstance;
 
 public class SchemaRegistryAclBindingsBuilder implements AclBindingsOrErrorBuilder {
@@ -17,11 +16,7 @@ public class SchemaRegistryAclBindingsBuilder implements AclBindingsOrErrorBuild
 
   @Override
   public AclBindingsOrError getAclBindingsOrError() {
-    try {
-      return AclBindingsOrError.forAclBindings(
-          builderProvider.buildBindingsForSchemaRegistry(schemaRegistry));
-    } catch (ConfigurationException e) {
-      return AclBindingsOrError.forError(e.getMessage());
-    }
+    return AclBindingsOrError.forAclBindings(
+        builderProvider.buildBindingsForSchemaRegistry(schemaRegistry));
   }
 }
