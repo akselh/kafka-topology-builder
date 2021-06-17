@@ -9,15 +9,15 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SyncTopicConfigAction extends BaseAction {
+public class UpdateTopicConfigAction extends BaseAction {
 
-  private static final Logger LOGGER = LogManager.getLogger(SyncTopicConfigAction.class);
+  private static final Logger LOGGER = LogManager.getLogger(UpdateTopicConfigAction.class);
 
   private final Topic topic;
   private final String fullTopicName;
   private final TopologyBuilderAdminClient adminClient;
 
-  public SyncTopicConfigAction(
+  public UpdateTopicConfigAction(
       TopologyBuilderAdminClient adminClient, Topic topic, String fullTopicName) {
     this.topic = topic;
     this.fullTopicName = fullTopicName;
