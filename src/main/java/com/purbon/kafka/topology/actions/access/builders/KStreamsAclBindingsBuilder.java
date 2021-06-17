@@ -3,7 +3,7 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.KStream;
 
-public class KStreamsAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class KStreamsAclBindingsBuilder implements AclBindingsBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final KStream app;
@@ -17,13 +17,13 @@ public class KStreamsAclBindingsBuilder implements AclBindingsOrErrorBuilder {
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
+  public AclBindingsResult getAclBindings() {
     if (prefix.isEmpty()) {
-      return AclBindingsOrError.forError(
+      return AclBindingsResult.forError(
           "KStream application prefix should not be empty."
               + " Please define the applicationID or allow a nonEmpty project prefix (aka everything before the topic)");
     }
-    return AclBindingsOrError.forAclBindings(
+    return AclBindingsResult.forAclBindings(
         builderProvider.buildBindingsForStreamsApp(
             app.getPrincipal(),
             prefix,

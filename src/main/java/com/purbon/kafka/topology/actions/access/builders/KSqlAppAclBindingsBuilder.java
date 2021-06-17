@@ -3,7 +3,7 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.KSqlApp;
 
-public class KSqlAppAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class KSqlAppAclBindingsBuilder implements AclBindingsBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final KSqlApp app;
@@ -17,12 +17,12 @@ public class KSqlAppAclBindingsBuilder implements AclBindingsOrErrorBuilder {
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
+  public AclBindingsResult getAclBindings() {
     if (prefix.isEmpty()) {
-      return AclBindingsOrError.forError(
+      return AclBindingsResult.forError(
           "KSqlApp application prefix should not be empty."
               + " Please define the applicationID or allow a nonEmpty project prefix (aka everything before the topic)");
     }
-    return AclBindingsOrError.forAclBindings(builderProvider.buildBindingsForKSqlApp(app, prefix));
+    return AclBindingsResult.forAclBindings(builderProvider.buildBindingsForKSqlApp(app, prefix));
   }
 }

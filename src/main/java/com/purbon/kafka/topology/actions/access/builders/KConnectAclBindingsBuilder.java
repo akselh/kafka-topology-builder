@@ -3,7 +3,7 @@ package com.purbon.kafka.topology.actions.access.builders;
 import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.Connector;
 
-public class KConnectAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class KConnectAclBindingsBuilder implements AclBindingsBuilder {
 
   private final Connector app;
   private final String topicPrefix;
@@ -17,8 +17,8 @@ public class KConnectAclBindingsBuilder implements AclBindingsOrErrorBuilder {
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
-    return AclBindingsOrError.forAclBindings(
+  public AclBindingsResult getAclBindings() {
+    return AclBindingsResult.forAclBindings(
         controlProvider.buildBindingsForConnect(app, topicPrefix));
   }
 }

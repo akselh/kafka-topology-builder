@@ -1,11 +1,11 @@
 package com.purbon.kafka.topology.actions.access.builders.rbac;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrError;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsResult;
 import com.purbon.kafka.topology.model.users.Schemas;
 
-public class SchemaAuthorizationAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class SchemaAuthorizationAclBindingsBuilder implements AclBindingsBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final Schemas schemaAuthorization;
@@ -17,8 +17,8 @@ public class SchemaAuthorizationAclBindingsBuilder implements AclBindingsOrError
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
-    return AclBindingsOrError.forAclBindings(
+  public AclBindingsResult getAclBindings() {
+    return AclBindingsResult.forAclBindings(
         builderProvider.setSchemaAuthorization(
             schemaAuthorization.getPrincipal(), schemaAuthorization.getSubjects()));
   }

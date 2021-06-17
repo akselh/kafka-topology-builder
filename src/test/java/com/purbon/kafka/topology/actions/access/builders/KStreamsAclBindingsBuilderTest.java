@@ -32,12 +32,12 @@ public class KStreamsAclBindingsBuilderTest {
     KStream app = new KStream("User:user", topics);
     String topicPrefix = "topicPrefix";
     builder = new KStreamsAclBindingsBuilder(aclsBindingsBuilder, app, topicPrefix);
-    assertThat(builder.getAclBindingsOrError().getAclBindings())
+    assertThat(builder.getAclBindings().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.TOPIC.name()
                     && b.getResourceName().equals(topicPrefix));
-    assertThat(builder.getAclBindingsOrError().getAclBindings())
+    assertThat(builder.getAclBindings().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.GROUP.name()
@@ -53,12 +53,12 @@ public class KStreamsAclBindingsBuilderTest {
     String applicationId = "applicationId";
     KStream app = new KStream("User:user", topics, Optional.of(applicationId));
     builder = new KStreamsAclBindingsBuilder(aclsBindingsBuilder, app, "topicPrefix");
-    assertThat(builder.getAclBindingsOrError().getAclBindings())
+    assertThat(builder.getAclBindings().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.TOPIC.name()
                     && b.getResourceName().equals(applicationId));
-    assertThat(builder.getAclBindingsOrError().getAclBindings())
+    assertThat(builder.getAclBindings().getAclBindings())
         .anyMatch(
             b ->
                 b.getResourceType() == ResourceType.GROUP.name()

@@ -1,11 +1,11 @@
 package com.purbon.kafka.topology.actions.access.builders.rbac;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrError;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsResult;
 import java.util.Collections;
 
-public class PredefinedAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class PredefinedAclBindingsBuilder implements AclBindingsBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final String principal;
@@ -24,8 +24,8 @@ public class PredefinedAclBindingsBuilder implements AclBindingsOrErrorBuilder {
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
-    return AclBindingsOrError.forAclBindings(
+  public AclBindingsResult getAclBindings() {
+    return AclBindingsResult.forAclBindings(
         Collections.singletonList(
             builderProvider.setPredefinedRole(principal, predefinedRole, topicPrefix)));
   }

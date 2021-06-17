@@ -1,13 +1,13 @@
 package com.purbon.kafka.topology.actions.access.builders.rbac;
 
 import com.purbon.kafka.topology.BindingsBuilderProvider;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrError;
-import com.purbon.kafka.topology.actions.access.builders.AclBindingsOrErrorBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsBuilder;
+import com.purbon.kafka.topology.actions.access.builders.AclBindingsResult;
 import com.purbon.kafka.topology.model.Component;
 import com.purbon.kafka.topology.model.User;
 import java.io.IOException;
 
-public class ClusterLevelAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class ClusterLevelAclBindingsBuilder implements AclBindingsBuilder {
 
   private final String role;
   private final User user;
@@ -23,12 +23,12 @@ public class ClusterLevelAclBindingsBuilder implements AclBindingsOrErrorBuilder
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
+  public AclBindingsResult getAclBindings() {
     try {
-      return AclBindingsOrError.forAclBindings(
+      return AclBindingsResult.forAclBindings(
           builderProvider.setClusterLevelRole(role, user.getPrincipal(), cmp));
     } catch (IOException e) {
-      return AclBindingsOrError.forError(e.getMessage());
+      return AclBindingsResult.forError(e.getMessage());
     }
   }
 }

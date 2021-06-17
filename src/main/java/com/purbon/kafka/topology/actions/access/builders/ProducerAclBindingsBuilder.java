@@ -4,7 +4,7 @@ import com.purbon.kafka.topology.BindingsBuilderProvider;
 import com.purbon.kafka.topology.model.users.Producer;
 import java.util.List;
 
-public class ProducerAclBindingsBuilder implements AclBindingsOrErrorBuilder {
+public class ProducerAclBindingsBuilder implements AclBindingsBuilder {
 
   private final BindingsBuilderProvider builderProvider;
   private final List<Producer> producers;
@@ -23,8 +23,8 @@ public class ProducerAclBindingsBuilder implements AclBindingsOrErrorBuilder {
   }
 
   @Override
-  public AclBindingsOrError getAclBindingsOrError() {
-    return AclBindingsOrError.forAclBindings(
+  public AclBindingsResult getAclBindings() {
+    return AclBindingsResult.forAclBindings(
         builderProvider.buildBindingsForProducers(producers, fullTopicName, prefixed));
   }
 }
