@@ -6,6 +6,7 @@ import com.purbon.kafka.topology.model.Topic;
 import java.io.IOException;
 import java.util.Set;
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
 
 public class TopicConfigUpdatePlanBuilder {
 
@@ -33,10 +34,13 @@ public class TopicConfigUpdatePlanBuilder {
         .getRawConfig()
         .forEach(
             (configKey, configValue) -> {
-              if (currentConfigs.get(configKey) == null) {
+              ConfigEntry currentConfigEntry = currentConfigs.get(configKey);
+              if (currentConfigEntry == null) {
                 topicConfigUpdatePlan.addNewConfig(configKey, configValue);
               } else {
-                topicConfigUpdatePlan.addConfigToUpdate(configKey, configValue);
+                if (!currentConfigEntry.value().equals(configValue)) {
+                  topicConfigUpdatePlan.addConfigToUpdate(configKey, configValue);
+                }
               }
 
               Set<String> configKeys = topic.getRawConfig().keySet();
