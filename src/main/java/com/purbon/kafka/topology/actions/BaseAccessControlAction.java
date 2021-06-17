@@ -16,10 +16,6 @@ public abstract class BaseAccessControlAction extends BaseAction {
 
   protected Collection<TopologyAclBinding> aclBindings;
 
-  public BaseAccessControlAction() {
-    this(new ArrayList<>());
-  }
-
   public BaseAccessControlAction(Collection<TopologyAclBinding> aclBindings) {
     this.aclBindings = aclBindings;
   }
