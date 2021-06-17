@@ -33,7 +33,7 @@ public class TopicConfigUpdatePlanBuilder {
         .getRawConfig()
         .forEach(
             (configKey, configValue) -> {
-              if (currentConfigs.get(configKey) != null) {
+              if (currentConfigs.get(configKey) == null) {
                 topicConfigUpdatePlan.addNewConfig(configKey, configValue);
               } else {
                 topicConfigUpdatePlan.addConfigToUpdate(configKey, configValue);

@@ -20,11 +20,11 @@ public class TopicConfigUpdatePlan {
   }
 
   public void addConfigToUpdate(String name, String value) {
-    newConfigValues.put(name, value);
+    updatedConfigValues.put(name, value);
   }
 
   public void addConfigToDelete(String name, String value) {
-    newConfigValues.put(name, value);
+    deletedConfigValues.put(name, value);
   }
 
   public Topic getTopic() {
