@@ -82,26 +82,23 @@ public class TopologyBuilderAdminClient {
     configUpdatePlan
         .getNewConfigValues()
         .forEach(
-            (configKey, configValue) -> {
-              configChanges.add(
-                  new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.SET));
-            });
+            (configKey, configValue) ->
+                configChanges.add(
+                    new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.SET)));
 
     configUpdatePlan
         .getUpdatedConfigValues()
         .forEach(
-            (configKey, configValue) -> {
-              configChanges.add(
-                  new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.SET));
-            });
+            (configKey, configValue) ->
+                configChanges.add(
+                    new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.SET)));
 
     configUpdatePlan
         .getDeletedConfigValues()
         .forEach(
-            (configKey, configValue) -> {
-              configChanges.add(
-                  new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.DELETE));
-            });
+            (configKey, configValue) ->
+                configChanges.add(
+                    new AlterConfigOp(new ConfigEntry(configKey, configValue), OpType.DELETE)));
     Map<ConfigResource, Collection<AlterConfigOp>> configs = new HashMap<>();
     configs.put(new ConfigResource(Type.TOPIC, configUpdatePlan.getFullTopicName()), configChanges);
 
