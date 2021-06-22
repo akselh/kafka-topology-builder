@@ -1,9 +1,9 @@
 package com.purbon.kafka.topology;
 
-import static com.purbon.kafka.topology.CommandLineInterface.*;
+import static com.purbon.kafka.topology.CommandLineInterface.BROKERS_OPTION;
 import static com.purbon.kafka.topology.Constants.*;
 import static com.purbon.kafka.topology.TopicManager.NUM_PARTITIONS;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.purbon.kafka.topology.actions.Action;
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -198,8 +199,7 @@ public class TopicManagerTest {
     String topicI1 = "foo.my-internal.topic";
     String topicI2 = "_my-internal.topic";
 
-    Set<String> appTopics =
-        Arrays.asList(topicC, topicI1, topicI2).stream().collect(Collectors.toSet());
+    Set<String> appTopics = Stream.of(topicC, topicI1, topicI2).collect(Collectors.toSet());
     when(adminClient.listApplicationTopics()).thenReturn(appTopics);
 
     topicManager.updatePlan(plan, topology);
@@ -235,7 +235,7 @@ public class TopicManagerTest {
 
     String topicC = "team.project.topicC";
 
-    Set<String> appTopics = Arrays.asList(topicC).stream().collect(Collectors.toSet());
+    Set<String> appTopics = Stream.of(topicC).collect(Collectors.toSet());
     when(adminClient.listApplicationTopics()).thenReturn(appTopics);
 
     topicManager.updatePlan(plan, topology);
