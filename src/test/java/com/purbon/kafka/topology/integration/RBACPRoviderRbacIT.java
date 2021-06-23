@@ -105,7 +105,7 @@ public class RBACPRoviderRbacIT extends MDSBaseTest {
   public void producerAclsCreation() throws IOException {
 
     List<Producer> producers = new ArrayList<>();
-    producers.add(new Producer("User:appp2"));
+    producers.add(new Producer("User:app2"));
 
     Project project = new ProjectImpl("project");
     project.setProducers(producers);
