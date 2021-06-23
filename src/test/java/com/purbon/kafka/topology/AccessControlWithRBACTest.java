@@ -1,6 +1,5 @@
 package com.purbon.kafka.topology;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.purbon.kafka.topology.model.Impl.ProjectImpl;
