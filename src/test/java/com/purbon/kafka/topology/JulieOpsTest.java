@@ -191,7 +191,7 @@ public class JulieOpsTest {
   }
 
   @Test
-  public void buiderRunTest() throws Exception {
+  public void builderRunTest() throws Exception {
     String fileOrDirPath = TestUtils.getResourceFilename("/descriptor.yaml");
 
     Configuration builderConfig = new Configuration(cliOps, props);
