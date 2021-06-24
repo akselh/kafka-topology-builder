@@ -236,7 +236,7 @@ public class TopologyBuilderAdminClient {
     return acls;
   }
 
-  public void createAcls(Collection<AclBinding> acls) throws IOException {
+  public void createAcls(Collection<AclBinding> acls) {
     try {
       adminClient.createAcls(acls).all().get();
     } catch (InvalidConfigurationException ex) {

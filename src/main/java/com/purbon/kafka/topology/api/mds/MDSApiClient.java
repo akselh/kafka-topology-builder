@@ -251,11 +251,6 @@ public class MDSApiClient extends JulieHttpClient {
    * @return ClusterIDs
    */
   public ClusterIDs withClusterIDs() {
-    try {
-      return clusterIDs.clone().clear();
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-      return null;
-    }
+    return clusterIDs.clone().clear();
   }
 }
