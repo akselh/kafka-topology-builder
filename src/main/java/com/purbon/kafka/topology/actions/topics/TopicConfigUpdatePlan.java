@@ -72,9 +72,6 @@ public class TopicConfigUpdatePlan {
   }
 
   public boolean hasConfigChanges() {
-    return updatePartitionCount ||
-            hasNewConfigs() ||
-            hasUpdatedConfigs() ||
-            hasDeletedConfigs();
+    return updatePartitionCount || hasNewConfigs() || hasUpdatedConfigs() || hasDeletedConfigs();
   }
 }
