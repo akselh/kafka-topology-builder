@@ -43,18 +43,17 @@ public class TopicConfigUpdatePlanBuilder {
               } else if (!currentConfigEntry.value().equals(configValue)) {
                 topicConfigUpdatePlan.addConfigToUpdate(configKey, configValue);
               }
+            });
 
-              Set<String> configKeys = topic.getRawConfig().keySet();
-
-              currentConfigs
-                  .entries()
-                  .forEach(
-                      entry -> {
-                        // TODO: This must check on other config sources as well - must be analyzed
-                        if (!entry.isDefault() && !configKeys.contains(entry.name())) {
-                          topicConfigUpdatePlan.addConfigToDelete(entry.name(), entry.value());
-                        }
-                      });
+    Set<String> configKeys = topic.getRawConfig().keySet();
+    currentConfigs
+        .entries()
+        .forEach(
+            entry -> {
+              // TODO: This must check on other config sources as well - must be analyzed
+              if (!entry.isDefault() && !configKeys.contains(entry.name())) {
+                topicConfigUpdatePlan.addConfigToDelete(entry.name(), entry.value());
+              }
             });
 
     return topicConfigUpdatePlan;
