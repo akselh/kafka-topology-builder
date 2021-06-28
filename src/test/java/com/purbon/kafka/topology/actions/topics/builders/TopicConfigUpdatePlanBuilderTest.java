@@ -1,10 +1,16 @@
 package com.purbon.kafka.topology.actions.topics.builders;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+
 import com.purbon.kafka.topology.TopicManager;
 import com.purbon.kafka.topology.actions.topics.TopicConfigUpdatePlan;
 import com.purbon.kafka.topology.api.adminclient.TopologyBuilderAdminClient;
 import com.purbon.kafka.topology.model.Impl.TopicImpl;
 import com.purbon.kafka.topology.model.Topic;
+import java.util.Collections;
+import java.util.HashMap;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.config.TopicConfig;
@@ -13,13 +19,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.util.Collections;
-import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
 
 public class TopicConfigUpdatePlanBuilderTest {
 
@@ -56,7 +55,9 @@ public class TopicConfigUpdatePlanBuilderTest {
 
   @Test
   public void shouldUpdateConfigForRetention() {
-    doReturn(createAlreadyOverriddenRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
+    doReturn(createAlreadyOverriddenRetentionConfig())
+        .when(adminClient)
+        .getActualTopicConfig(TOPIC_NAME);
     Topic topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 1, 0);
@@ -64,7 +65,9 @@ public class TopicConfigUpdatePlanBuilderTest {
 
   @Test
   public void shouldDeleteConfigForRetention() {
-    doReturn(createAlreadyOverriddenRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
+    doReturn(createAlreadyOverriddenRetentionConfig())
+        .when(adminClient)
+        .getActualTopicConfig(TOPIC_NAME);
     Topic topic = createTopic();
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 1);
@@ -90,20 +93,32 @@ public class TopicConfigUpdatePlanBuilderTest {
   }
 
   private Config createDefaultRetentionConfig() {
-    ConfigEntry configEntry = createRetentionConfig(DEFAULT_RETENTION_MS, ConfigEntry.ConfigSource.DEFAULT_CONFIG);
+    ConfigEntry configEntry =
+        createRetentionConfig(DEFAULT_RETENTION_MS, ConfigEntry.ConfigSource.DEFAULT_CONFIG);
     return new Config(Collections.singletonList(configEntry));
   }
 
   private Config createAlreadyOverriddenRetentionConfig() {
-    ConfigEntry configEntry = createRetentionConfig("432000000", ConfigEntry.ConfigSource.DYNAMIC_TOPIC_CONFIG);
+    ConfigEntry configEntry =
+        createRetentionConfig("432000000", ConfigEntry.ConfigSource.DYNAMIC_TOPIC_CONFIG);
     return new Config(Collections.singletonList(configEntry));
   }
 
-  private ConfigEntry createRetentionConfig(final String s, final ConfigEntry.ConfigSource dynamicTopicConfig) {
-    return new ConfigEntry(TopicConfig.RETENTION_MS_CONFIG, s, dynamicTopicConfig, false, false, Collections.emptyList(), ConfigEntry.ConfigType.LONG, null);
+  private ConfigEntry createRetentionConfig(
+      final String s, final ConfigEntry.ConfigSource dynamicTopicConfig) {
+    return new ConfigEntry(
+        TopicConfig.RETENTION_MS_CONFIG,
+        s,
+        dynamicTopicConfig,
+        false,
+        false,
+        Collections.emptyList(),
+        ConfigEntry.ConfigType.LONG,
+        null);
   }
 
-  private void assertNewUpdatedAndDeletedCounts(TopicConfigUpdatePlan plan, int expectedNew, int expectedUpdated, int expectedDeleted) {
+  private void assertNewUpdatedAndDeletedCounts(
+      TopicConfigUpdatePlan plan, int expectedNew, int expectedUpdated, int expectedDeleted) {
     assertEquals(expectedNew, plan.getNewConfigValues().size());
     assertEquals(expectedUpdated, plan.getUpdatedConfigValues().size());
     assertEquals(expectedDeleted, plan.getDeletedConfigValues().size());
