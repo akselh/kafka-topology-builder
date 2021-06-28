@@ -31,16 +31,16 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldNotChangeConfigWhenNoConfig() {
     doReturn(createEmptyConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic();
-    TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
+    var topic = createTopic();
+    var plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 0);
   }
 
   @Test
   public void shouldNotAddNewConfigForNumPartitionsButShouldUpdateFlag() {
     doReturn(createEmptyConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TopicManager.NUM_PARTITIONS, "5");
-    TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
+    var topic = createTopic(TopicManager.NUM_PARTITIONS, "5");
+    var plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 0);
     assertTrue(plan.isUpdatePartitionCount());
   }
@@ -48,8 +48,8 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldAddNewConfigForRetention() {
     doReturn(createDefaultRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
-    TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
+    var topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
+    var plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 1, 0, 0);
   }
 
@@ -58,8 +58,8 @@ public class TopicConfigUpdatePlanBuilderTest {
     doReturn(createAlreadyOverriddenRetentionConfig())
         .when(adminClient)
         .getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
-    TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
+    var topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
+    var plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 1, 0);
   }
 
@@ -68,13 +68,13 @@ public class TopicConfigUpdatePlanBuilderTest {
     doReturn(createAlreadyOverriddenRetentionConfig())
         .when(adminClient)
         .getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic();
-    TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
+    var topic = createTopic();
+    var plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 1);
   }
 
   private TopicConfigUpdatePlan getTopicConfigUpdatePlan(Topic topic) {
-    TopicConfigUpdatePlanBuilder builder = new TopicConfigUpdatePlanBuilder(adminClient);
+    var builder = new TopicConfigUpdatePlanBuilder(adminClient);
     return builder.createTopicConfigUpdatePlan(topic, TOPIC_NAME);
   }
 
@@ -93,13 +93,13 @@ public class TopicConfigUpdatePlanBuilderTest {
   }
 
   private Config createDefaultRetentionConfig() {
-    ConfigEntry configEntry =
+    var configEntry =
         createRetentionConfig(DEFAULT_RETENTION_MS, ConfigEntry.ConfigSource.DEFAULT_CONFIG);
     return new Config(Collections.singletonList(configEntry));
   }
 
   private Config createAlreadyOverriddenRetentionConfig() {
-    ConfigEntry configEntry =
+    var configEntry =
         createRetentionConfig("432000000", ConfigEntry.ConfigSource.DYNAMIC_TOPIC_CONFIG);
     return new Config(Collections.singletonList(configEntry));
   }
