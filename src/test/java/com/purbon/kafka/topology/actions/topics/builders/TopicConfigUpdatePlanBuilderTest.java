@@ -8,7 +8,6 @@ import com.purbon.kafka.topology.model.Topic;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.config.TopicConfig;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -33,7 +32,7 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldNotChangeConfigWhenNoConfig() {
     doReturn(createEmptyConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TOPIC_NAME);
+    Topic topic = createTopic();
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 0);
   }
@@ -41,7 +40,7 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldNotAddNewConfigForNumPartitionsButShouldUpdateFlag() {
     doReturn(createEmptyConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TOPIC_NAME, TopicManager.NUM_PARTITIONS, "5");
+    Topic topic = createTopic(TopicManager.NUM_PARTITIONS, "5");
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 0);
     assertTrue(plan.isUpdatePartitionCount());
@@ -50,7 +49,7 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldAddNewConfigForRetention() {
     doReturn(createDefaultRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TOPIC_NAME, TopicConfig.RETENTION_MS_CONFIG, "1000");
+    Topic topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 1, 0, 0);
   }
@@ -58,7 +57,7 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldUpdateConfigForRetention() {
     doReturn(createAlreadyOverriddenRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TOPIC_NAME, TopicConfig.RETENTION_MS_CONFIG, "1000");
+    Topic topic = createTopic(TopicConfig.RETENTION_MS_CONFIG, "1000");
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 1, 0);
   }
@@ -66,7 +65,7 @@ public class TopicConfigUpdatePlanBuilderTest {
   @Test
   public void shouldDeleteConfigForRetention() {
     doReturn(createAlreadyOverriddenRetentionConfig()).when(adminClient).getActualTopicConfig(TOPIC_NAME);
-    Topic topic = createTopic(TOPIC_NAME);
+    Topic topic = createTopic();
     TopicConfigUpdatePlan plan = getTopicConfigUpdatePlan(topic);
     assertNewUpdatedAndDeletedCounts(plan, 0, 0, 1);
   }
@@ -76,14 +75,14 @@ public class TopicConfigUpdatePlanBuilderTest {
     return builder.createTopicConfigUpdatePlan(topic, TOPIC_NAME);
   }
 
-  private Topic createTopic(String name, String configName, String configValue) {
+  private Topic createTopic(String configName, String configValue) {
     var config = new HashMap<String, String>();
     config.put(configName, configValue);
-    return new TopicImpl(name, config);
+    return new TopicImpl(TopicConfigUpdatePlanBuilderTest.TOPIC_NAME, config);
   }
 
-  private Topic createTopic(String name) {
-    return new TopicImpl(name);
+  private Topic createTopic() {
+    return new TopicImpl(TopicConfigUpdatePlanBuilderTest.TOPIC_NAME);
   }
 
   private Config createEmptyConfig() {
