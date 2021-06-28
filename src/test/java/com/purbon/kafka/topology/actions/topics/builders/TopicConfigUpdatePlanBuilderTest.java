@@ -104,8 +104,7 @@ public class TopicConfigUpdatePlanBuilderTest {
     return new Config(Collections.singletonList(configEntry));
   }
 
-  private ConfigEntry createRetentionConfig(
-      final String s, final ConfigEntry.ConfigSource dynamicTopicConfig) {
+  private ConfigEntry createRetentionConfig(String s, ConfigEntry.ConfigSource dynamicTopicConfig) {
     return new ConfigEntry(
         TopicConfig.RETENTION_MS_CONFIG,
         s,
